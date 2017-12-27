@@ -1,0 +1,8 @@
+; Add and sub test
+
+MOV R10 100
+ADD R10 300
+SUB R10 1
+
+MOV $OUTPORTI R10
+HLT

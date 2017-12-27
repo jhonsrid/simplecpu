@@ -1,0 +1,26 @@
+- Way to allocate memory ranges in assembler (RESERVE?)
+- Hardcoded values all over the place (assembler sizes etc)
+- Clean up interrupt driven console I/O
+- Write simple monitor OS, ie:
+	- Trap keyboard interrupt. "$" breaks into monitor.
+	- Print prompt
+	- Parse input
+	- D1234		 // Display memory location 1234
+	- W1234 5678 // Write value 5678 to memory location 1234.
+	- W1234 'A'  // Write value 65 to memory location 1234.
+	- C			 // Continue program execution
+	(etc)
+
+Unlikely:
+	Port Forth environment? (Would just involve porting runtime, which _might_ be
+	possible by just translating the assembler!)
+
+	http://wiki.strotmann.de/wiki/Wiki.jsp?page=Forth
+	http://wiki.forthfreak.net/index.cgi?ForthSystems
+	http://www.forth.com/starting-forth/sf0/sf0.html
+	http://wiki.forthfreak.net/index.cgi?CrossForth
+
+Block file I/O?
+Bitmap screen? (Via Allegro?)
+Small-C cross compiler?
+ROM support?

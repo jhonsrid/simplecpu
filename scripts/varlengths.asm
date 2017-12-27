@@ -1,0 +1,8 @@
+MOV $VAR1 1
+MOV $VAR2 2
+MOV $VAR3 3
+HLT
+
+$VAR1 {10}
+$VAR2 {20}
+$VAR3 {30}
