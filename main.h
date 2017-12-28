@@ -87,10 +87,11 @@ void pop(int lam, int ram);		/* Pop from stack */
 void pushu(int lam, int ram);	/* Push user registers to stack */
 void popu(int lam, int ram);	/* Pop user registers from stack */
 void irq(int lam, int ram);		/* Interrupt call */
+void mod(int lam, int ram);		/* Modulo division call */
 
 #define HLT 0 /* Halt instruction */
 
-#define INSTRUCTION_COUNT 21
+#define INSTRUCTION_COUNT 22
 
 #ifdef MAIN_GLOBALS
 t_instruction instructions[INSTRUCTION_COUNT] = {
@@ -114,7 +115,8 @@ t_instruction instructions[INSTRUCTION_COUNT] = {
 	{ "RET",	 17, 1, ret },
 	{ "PUSHU",   18, 1, pushu },
 	{ "POPU",	 19, 1, popu },
-	{ "IRQ",     20, 2, irq }
+	{ "IRQ",     20, 2, irq },
+	{ "MOD",	 21, 3, mod }
 };
 int debugprint=0;
 #else
@@ -194,8 +196,7 @@ void assemble(void);
 void setlvrv(int lam, int ram, int opcode);
 
 /* platform.c */
-int kbhit(void);
-int getch(void);
+int posix_kbhit(void);
 
 #define KEYPRESS_INTERRUPT 0 /* IRQ0 is the keypress interrupt */
 #define OS_INTERRUPT 1 /* Operating system interrupt for system calls */

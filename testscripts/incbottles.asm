@@ -1,1 +1,0 @@
-#include "..\scripts\bottles.asm"

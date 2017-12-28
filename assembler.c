@@ -282,7 +282,7 @@ void createvariables()
 
 	for(i=0; i < 16; i++) /* Create I01 to I15 for interrupt vectors */
 	{
-		sprintf(varname, "$I%02d", i);
+		snprintf(varname, sizeof(varname), "$I%02d", i);
 		createvariable(varname, VECTOR_BASE + i);
 	}
 }

@@ -5,10 +5,7 @@
 #include "main.h"
 
 #ifdef WIN32
-#include <conio.h>
-#else
-#include <termios.h>
-#include <unistd.h>
+#include <conio.h> // _kbhit()
 #endif
 
 static int *lv, *rv;
@@ -42,7 +39,7 @@ int dokbd(void)
 		return 1;
 	}
 #else
-	if (kbhit())	
+	if (posix_kbhit())
 	{
 		int test = getchar();
 		printf("echo: %c\n", test);
@@ -64,7 +61,6 @@ void inner_irq(int lam, int ram, int irqnum)
 		exit(-1);
 	}
 	PCVALUE = memory[VECTOR_BASE + irqnum]; /* Set PC to dereference of vector table */
-	printf("PCVALUE = %d\n", PCVALUE);
 	if (PCVALUE < 16 || PCVALUE > MEMWORDS) {
 		printf("RUNTIME ERROR: Illegal PC value (%d) from IRQ (%d) deref (%d) in vector table\n", PCVALUE, irqnum, memory[VECTOR_BASE + irqnum]);
 	}
@@ -78,13 +74,10 @@ int runtime(void)
 	PCVALUE = STARTPOS;
 	SPVALUE = STACKTOP; /* Empty stack */
 
-	//printf("\nRunning...\n\n");
-
 	while(!stoprun)
 	{
 		if ((cycles % 1000) == 0 && dokbd()) /* Raise an interrupt if keyboard hit */
 		{
-			printf("cycle: %d\n", cycles);
 			PCVALUE = PCVALUE - 2;	/* Pre-decrement PC twice, (because RET and then MAIN CODE is going to increment it!) */
 			inner_irq(0, 0, KEYPRESS_INTERRUPT);
 		}
@@ -176,6 +169,12 @@ void irq(int lam, int ram)
 	absolute = 1; /* Required! */
 }
 
+void mod(int lam, int ram)
+{
+	*lv = *lv % *rv;
+	return;
+}
+
 void cmp(int lam, int ram)
 {
 	eq = (*lv == *rv);
@@ -183,7 +182,7 @@ void cmp(int lam, int ram)
 	return;
 }
 
-void jmp2(int lam, int ram, int flag)
+void jmp_inner(int lam, int ram, int flag)
 {
 	if (flag) {
 		PCVALUE = PCTARGETPLUS1;
@@ -203,11 +202,11 @@ static void pop_inner(int reg)
 	memory[reg]  = memory[SPVALUE]; /* Dereference SP */
 }
 
-void jeq(int lam, int ram)  { jmp2(lam, ram, eq); }
-void jnq(int lam, int ram)  { jmp2(lam, ram, !eq); }
-void jgt(int lam, int ram)  { jmp2(lam, ram, (c && !eq)); }
-void jlt(int lam, int ram)  { jmp2(lam, ram, (!c && !eq)); }
-void jmp(int lam, int ram)  { jmp2(lam, ram, 1); }
+void jeq(int lam, int ram)  { jmp_inner(lam, ram, eq); }
+void jnq(int lam, int ram)  { jmp_inner(lam, ram, !eq); }
+void jgt(int lam, int ram)  { jmp_inner(lam, ram, (c && !eq)); }
+void jlt(int lam, int ram)  { jmp_inner(lam, ram, (!c && !eq)); }
+void jmp(int lam, int ram)  { jmp_inner(lam, ram, 1); }
 void push(int lam, int ram) { push2(PCTARGETPLUS1); }
 void pop(int lam, int ram)  { pop_inner(PCTARGETPLUS1); }
 

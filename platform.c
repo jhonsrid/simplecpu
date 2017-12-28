@@ -1,11 +1,12 @@
 /* Platform dependent code, (keyboard input!) */
 
+#ifndef WIN32
 #include <stdio.h>
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
 
-int kbhit(void)
+int posix_kbhit(void)
 {
   struct termios oldt, newt;
   int ch;
@@ -31,4 +32,5 @@ int kbhit(void)
 
   return 0;
 }
+#endif
 

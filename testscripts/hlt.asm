@@ -1,4 +1,0 @@
-HLT
-; Not reached
-MOV R10 12345
-MOV $OUTPORTI R10

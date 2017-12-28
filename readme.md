@@ -1,10 +1,16 @@
 # simplecpu, a simple CPU emulator and assembler in C99, ~1000 LOC.
 
+C99 only, no dependencies other than libc and POSIX.
+
 ## Directories
 * scripts contains example .ASM files to run.
 
 ## Building
-* ./make.sh
+* POSIX (Linux, OSX, Cygwin)
+** ./make.sh
+
+* Windows (native, Visual Studio 2015 Community).
+** VS\simplecpu.sln
 
 ## Running
 * simplecpu asmfilename
@@ -16,71 +22,74 @@ memory images.
 ## Assembly language syntax
 ;										Comment
 
-:LABEL							Label
+:LABEL									Label
 
-12345								Literal number
+12345									Literal number
 
-'A'									Literal ASCII character (eg 65)
+'A'										Literal ASCII character (eg 65)
 
 :BOTTLES
-"bottles of beer"		Labelled string
+"bottles of beer"						Labelled string
 
-\#include						Include file, eg: #include "../scripts/incl.asm"
+\#include								Include file, eg: #include "../scripts/incl.asm"
 
 Target operand is first, eg:
     ADD REG LIT will add literal LIT to register REG.
 
 ### Instructions:
 
-* HLT					HALT (stop CPU)
-* NOP					No operation
-* INC	REG				Increment register, eg INC R10
-* DEC	REG				Decrement register, eg DEC R10
-* ADD	REG LIT			Add literal to register
-* ADD REG REG     Add register v	ADD REG LIT, or ADD REG REG
-* SUB	REG LIT
+* HLT							HALT (stop CPU)
+* NOP							No operation
+* INC REG						Increment register, eg INC R10
+* DEC REG						Decrement register, eg DEC R10
+* ADD REG LIT					Add literal to register
+* ADD REG REG     				Add register v	
+* ADD REG LIT
+* ADD REG REG
+* SUB REG LIT
 * SUB REG REG
 * MUL REG LIT
 * MUL REG REG
 * JMP :LABEL
-* JEQ :LABEL			Jump to :LABEL if equal
-* JNQ	:LABEL			Jump to :LABEL if not equal
-* JGT	:LABEL			Jump to :LABEL if greater than
-* JLT	:LABEL			Jump to :LABEL if less than
-* MOV	REG REG			
+* JEQ :LABEL					Jump to :LABEL if equal
+* JNQ :LABEL					Jump to :LABEL if not equal
+* JGT :LABEL					Jump to :LABEL if greater than
+* JLT :LABEL					Jump to :LABEL if less than
+* MOV REG REG			
 * MOV REG LIT
-* MOV REG PORT		MOV R9 $INPORTC or MOV R9 $INPORTI
-* MOV PORT REG		MOV $OUTPORTC R10 or MOV $OUTPORTI R10		
-* CMP REG LIT			Compare and set flags
-* CMP REG REG			Compare and set flags
+* MOV REG PORT					MOV R9 $INPORTC or MOV R9 $INPORTI
+* MOV PORT REG					MOV $OUTPORTC R10 or MOV $OUTPORTI R10		
+* CMP REG LIT					Compare and set flags
+* CMP REG REG					Compare and set flags
 * PUSH LIT
 * PUSH REG
-* POP REG					Pop to specific register
-* CALL						Call :LABELNAME (Subroutine call)
+* POP REG						Pop to specific register
+* CALL							Call :LABELNAME (Subroutine call)
 * RET							Return from subroutine
-* PUSHU						Push all user registers to stack, (not SP or PC).
-* POPU						Pop all user registers from stack, (not SP or PC).
-* IRQ	NUM					Raise IRQ
-* REBASE					Choose different memory location to continue assembling from.
+* PUSHU							Push all user registers to stack, (not SP or PC).
+* POPU							Pop all user registers from stack, (not SP or PC).
+* IRQ NUM						Raise IRQ
+* REBASE						Choose different memory location to continue assembling from.
+* MOD REG LIT					Modulo division, leave remainder in REG.
+* MOD REG REG					Modulo division, leave remainder in REG.
 
 ### Flags:
 * EQ							Equality flag
 * C								Carry flag
 
 ### PORTS:
-$INPORTC	Input character
+$INPORTC						Input character
 
-$INPORTI	Input integer
+$INPORTI						Input integer
 
-$OUTPORTC	Print output character
+$OUTPORTC						Print output character
 
-$OUTPORTI	Print output integer
+$OUTPORTI						Print output integer
 
-$I00 - $I?? Interrupt vectors, eg:
-			MOV $I00 500 (set int 0 to jump to location 500 when called)
+$I00 - $I15						Interrupt vectors
 
 ### VARIABLES
-$XYZABC		Assign label "XYZABC" to a word of storage.
+$XYZABC							Assign label "XYZABC" to a word of storage.
 
 ### Interrupts
 
@@ -91,7 +100,7 @@ IRQ0 is KEYBOARD interrupt, eg:
 	; Setup interrupt handler (IRQ0)
 	MOV $I00 500			; ie jump to location 500 to service IRQ0 (keyboard)
 
-	REBASE 500
+	REBASE 500				; Move assembly point to location 500
 	MOV R9 $INPORTC			; Get character
 	CMP R9 'X'				; See if it's eXit
 	JEQ :INPEND				; Jump to "end of input"
