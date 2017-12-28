@@ -88,8 +88,7 @@ void addtoken(char *token)
 		printf("Got unknown token: '%s', exiting...\n", token);
 		exit(-1);
 	}
-	val = malloc(strlen(token));
-	strcpy(val, token);
+    val = strdup(token);
 	tokenArray[tokenpos].tokType = tokType;
 	tokenArray[tokenpos].tokValue = val;
 
@@ -97,8 +96,7 @@ void addtoken(char *token)
 	{
 		tokType = getTokenType(token); // Do it again (previous call removed "[]")
 		tokenArray[tokenpos].subTokType = tokType;
-		val = malloc(strlen(token));
-		strcpy(val, token);
+		val = strdup(token);
 	}
 
 	tokenpos++;
