@@ -1,5 +1,8 @@
+- Clean up interrupt I/O (drops characters at moment, possible due to polling interval)
 - Way to allocate memory ranges in assembler (RESERVE?)
 - Hardcoded values all over the place (assembler sizes etc)
+- Write simple list structure rather than having fixed size arrays? (Or just
+  have an initial size and realloc everything once that's reached?)
 - Clean up interrupt driven console I/O
 - Write simple monitor OS, ie:
 	- Trap keyboard interrupt. "$" breaks into monitor.

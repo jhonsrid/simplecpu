@@ -31,6 +31,5 @@ int main(int argc, char *argv[])
 	assemble();
 	ret = runtime();
 	printf("Finished runtime, executed %d cycles\n", ret);
-	//reset_term_settings();
 	return ret;
 }

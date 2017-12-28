@@ -267,11 +267,12 @@ static void pospone_variable_ref(int ins)
 void createvariable(char *name, int location)
 {
 	variables[variablemax].name = _strdup(name);
-	variables[variablemax].position = location; /* Memory location for outportc */
+	variables[variablemax].position = location;
 	debugout("Created VARIABLE            : '%s' to %d\n", name, location);
 	variablemax++;
 }
 
+/* Create variables, including memory mapped I/O and interrupt vectors */
 void createvariables()
 {
 	int i;
@@ -280,7 +281,7 @@ void createvariables()
 	createvariable("$OUTPORTI", OUTPORTI_LOCATION);
 	createvariable("$INPORTC", INPORTC_LOCATION);
 
-	for(i=0; i < 16; i++) /* Create I01 to I15 for interrupt vectors */
+	for(i=0; i < VECTOR_COUNT; i++) /* Create I01 to I15 for interrupt vectors */
 	{
 		snprintf(varname, sizeof(varname), "$I%02d", i);
 		createvariable(varname, VECTOR_BASE + i);
@@ -316,12 +317,10 @@ void assemble()
 
 	debugout("\nAssembled %d tokens, (used %d memory words)\n", tokenpos, PCVALUE - STARTPOS);
 
-	/* Insert label positions! */
 	debugout("Inserting label references...\n");
 	j = assemble_label_refs();
 	debugout("Inserted %d label references.\n\n", j);
 
-	/* Insert variable positions */
 	debugout("Inserting variable references...\n");
 	j = assemble_variable_refs();
 	debugout("Inserted %d variable references.\n", j);

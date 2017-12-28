@@ -14,12 +14,13 @@
 
 #define SPVALUE memory[1]
 
-#define MEMWORDS (1024 + 16 + 2) /* Word addressed machine, "16" is to leave room for interrupt vectors on top, plus gap plus INPORTC above that! */
-#define STACKTOP 1023			 /* Start stack at (0 based) 1023, (ie last word in memory) */
-#define STACKELEMENTS 1000		 /* Maximum number of elements in stack */
-#define STARTPOS 16				 /* Start at memory location 16, (0 based), to avoid scribbing on registers! */
-#define VECTOR_BASE	1024		 /* 0 based, ie 1025th element */
-#define KBDPOLL_INTERVAL 1000	/* Number of cycles between keyboard polls */
+#define MEMWORDS (1024 + 16 + 2)	/* Word addressed machine, "16" is to leave room for interrupt vectors on top, plus gap plus INPORTC above that! */
+#define STACKTOP 1023				/* Start stack at (0 based) 1023, (ie last word in memory) */
+#define STACKELEMENTS 1000			/* Maximum number of elements in stack */
+#define STARTPOS 16					/* Start at memory location 16, (0 based), to avoid scribbing on registers! */
+#define VECTOR_BASE	1024			/* 0 based, ie 1025th element */
+#define KBDPOLL_INTERVAL 1000		/* Number of cycles between keyboard polls */
+#define VECTOR_COUNT 16				/* How many interrupt vectors? */
 
 
 /* R0 to R15 are first 16 words of memory, no need for pretend register addresses

@@ -42,7 +42,6 @@ int dokbd(void)
 	if (posix_kbhit())
 	{
 		int test = getchar();
-		printf("echo: %c\n", test);
 		memory[INPORTC_LOCATION] = test;
 		return 1;
 	}
@@ -61,7 +60,7 @@ void inner_irq(int lam, int ram, int irqnum)
 		exit(-1);
 	}
 	PCVALUE = memory[VECTOR_BASE + irqnum]; /* Set PC to dereference of vector table */
-	if (PCVALUE < 16 || PCVALUE > MEMWORDS) {
+	if (PCVALUE < VECTOR_COUNT || PCVALUE > MEMWORDS) {
 		printf("RUNTIME ERROR: Illegal PC value (%d) from IRQ (%d) deref (%d) in vector table\n", PCVALUE, irqnum, memory[VECTOR_BASE + irqnum]);
 	}
 }

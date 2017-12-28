@@ -150,7 +150,7 @@ int preprocessor(char *line)
 		printf("Unknown preprocessor statement found, exiting...\n");
 		exit(-1);
 	}
-	strcpy(locline, line + 9);
+	strcpy(locline, line + strlen("#include "));
     removeChar(locline, '\r'); // Troublesome otherwise!
     removeChar(locline, '\n');
 	removeChar(locline, '"');
