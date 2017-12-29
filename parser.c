@@ -6,6 +6,7 @@
 
 #include "main.h"
 
+
 int gotinstruction = 0;
 
 void removeChar(char *str, char toremove)
@@ -88,7 +89,7 @@ void addtoken(char *token)
 		printf("Got unknown token: '%s', exiting...\n", token);
 		exit(-1);
 	}
-    val = strdup(token);
+	val = _strdup(token);
 	tokenArray[tokenpos].tokType = tokType;
 	tokenArray[tokenpos].tokValue = val;
 
@@ -96,7 +97,7 @@ void addtoken(char *token)
 	{
 		tokType = getTokenType(token); // Do it again (previous call removed "[]")
 		tokenArray[tokenpos].subTokType = tokType;
-		val = strdup(token);
+		val = _strdup(token);
 	}
 
 	tokenpos++;
@@ -149,7 +150,7 @@ int preprocessor(char *line)
 		exit(-1);
 	}
 	strcpy(locline, line + strlen("#include "));
-    removeChar(locline, '\r'); // Troublesome otherwise!
+    removeChar(locline, '\r');
     removeChar(locline, '\n');
 	removeChar(locline, '"');
 	removeChar(locline, '\'');

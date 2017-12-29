@@ -21,6 +21,7 @@
 #define VECTOR_BASE	1024			/* 0 based, ie 1025th element */
 #define KBDPOLL_INTERVAL 1000		/* Number of cycles between keyboard polls */
 #define VECTOR_COUNT 16				/* How many interrupt vectors? */
+#define INPUTBUFFER_SZ 32			/* How many characters can we store in the input buffer? */
 
 
 /* R0 to R15 are first 16 words of memory, no need for pretend register addresses
@@ -198,6 +199,16 @@ void setlvrv(int lam, int ram, int opcode);
 
 /* platform.c */
 int posix_kbhit(void);
+char buffered_getchar(void);
 
 #define KEYPRESS_INTERRUPT 0 /* IRQ0 is the keypress interrupt */
 #define OS_INTERRUPT 1 /* Operating system interrupt for system calls */
+
+#ifdef _MSC_VER
+#pragma warning(disable:4996)
+#endif
+
+
+#ifndef WIN32
+#define _strdup strdup
+#endif

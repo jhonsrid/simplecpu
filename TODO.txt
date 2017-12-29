@@ -4,7 +4,7 @@
 - Write simple list structure rather than having fixed size arrays? (Or just
   have an initial size and realloc everything once that's reached?)
 - Clean up interrupt driven console I/O
-- Write simple monitor OS, ie:
+- Write simple machine monitor, ie:
 	- Trap keyboard interrupt. "$" breaks into monitor.
 	- Print prompt
 	- Parse input
@@ -26,4 +26,4 @@ Unlikely:
 Block file I/O?
 Bitmap screen? (Via Allegro?)
 Small-C cross compiler?
-ROM support?
+ROM support? (Assemble to file, load on command line to predetermined address?)

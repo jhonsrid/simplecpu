@@ -5,10 +5,6 @@
 #include <limits.h>
 #include <stdarg.h>
 
-#ifndef WIN32
-#define _strdup strdup
-#endif
-
 void debugout(const char *format, ...)
 {
 	va_list args;
@@ -273,7 +269,7 @@ void createvariable(char *name, int location)
 }
 
 /* Create variables, including memory mapped I/O and interrupt vectors */
-void createvariables()
+void createvariables(void)
 {
 	int i;
 	char varname[20];
@@ -289,7 +285,7 @@ void createvariables()
 }
 
 /* Assemble from token stream */
-void assemble()
+void assemble(void)
 {
 	int i, j;
 

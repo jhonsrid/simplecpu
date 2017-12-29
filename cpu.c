@@ -35,12 +35,13 @@ int dokbd(void)
 	}
 	if (_kbhit()) {
 		memory[INPORTC_LOCATION] = _getch();
-		prevchar = memory[INPORTC_LOCATION];
+		prevchar = (unsigned char)memory[INPORTC_LOCATION];
 		return 1;
 	}
 #else
 	if (posix_kbhit())
 	{
+		//int test = buffered_getchar();
 		int test = getchar();
 		memory[INPORTC_LOCATION] = test;
 		return 1;
