@@ -1,4 +1,6 @@
-- Clean up interrupt I/O (drops characters at moment, possible due to polling interval)
+- Indirect addressing (X register style?) Or  MOV R[Rn], R or something?
+- Simplify much further, (make into accumulator type machine?)
+- Simplify call syntax, (just have link register rather than return stack?)
 - Way to allocate memory ranges in assembler (RESERVE?)
 - Hardcoded values all over the place (assembler sizes etc)
 - Write simple list structure rather than having fixed size arrays? (Or just

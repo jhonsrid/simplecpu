@@ -1,0 +1,19 @@
+; Test CALL and RET recursively (about 70 call frames fit in stack)
+MOV R5 1
+CALL :FIRST
+HLT
+
+:FIRST
+MOV $OUTPORTI R5
+CALL :CRLF
+INC R5
+CMP R5 61
+JEQ :ENDIT
+CALL :FIRST
+:ENDIT
+RET
+
+:CRLF
+MOV $OUTPORTC 13
+MOV $OUTPORTC 10
+RET

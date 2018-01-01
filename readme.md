@@ -6,7 +6,7 @@ C99 only, no dependencies other than libc and POSIX.
 * scripts contains example .ASM files to run.
 
 ## Building
-* POSIX (Linux, OSX, Cygwin)
+* POSIX (Linux [x64 and Raspberry Pi]), OSX, Cygwin)
 ** ./make.sh
 
 * Windows (native, Visual Studio 2015 Community).
@@ -43,7 +43,7 @@ Target operand is first, eg:
 * INC REG						Increment register, eg INC R10
 * DEC REG						Decrement register, eg DEC R10
 * ADD REG LIT					Add literal to register
-* ADD REG REG     				Add register v	
+* ADD REG REG     				Add register v
 * ADD REG LIT
 * ADD REG REG
 * SUB REG LIT

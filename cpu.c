@@ -66,9 +66,9 @@ void inner_irq(int lam, int ram, int irqnum)
 	}
 }
 
-int runtime(void)
+uint64_t runtime(void)
 {
-	int cycles = 0;
+	uint64_t cycles = 0;
 	int opcode;
 	int lam, ram;
 	PCVALUE = STARTPOS;

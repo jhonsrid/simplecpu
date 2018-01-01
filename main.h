@@ -14,8 +14,9 @@
 
 #define SPVALUE memory[1]
 
-#define MEMWORDS (1024 + 16 + 2)	/* Word addressed machine, "16" is to leave room for interrupt vectors on top, plus gap plus INPORTC above that! */
-#define STACKTOP 1023				/* Start stack at (0 based) 1023, (ie last word in memory) */
+#define BASEMEM 4096
+#define MEMWORDS (BASEMEM + 16 + 2)	/* Word addressed machine, "16" is to leave room for interrupt vectors on top, plus gap plus INPORTC above that! */
+#define STACKTOP (BASEMEM - 1)		/* Start stack at (0 based) BASEMEM-1, (ie last word in memory) */
 #define STACKELEMENTS 1000			/* Maximum number of elements in stack */
 #define STARTPOS 16					/* Start at memory location 16, (0 based), to avoid scribbing on registers! */
 #define VECTOR_BASE	1024			/* 0 based, ie 1025th element */
@@ -192,7 +193,7 @@ extern int variablerefmax;
 #endif
 
 /* Function prototypes */
-int runtime(void);
+uint64_t runtime(void);
 void tokenize(char *fn);
 void assemble(void);
 void setlvrv(int lam, int ram, int opcode);

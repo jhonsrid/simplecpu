@@ -16,7 +16,7 @@ void usage(void)
 
 int main(int argc, char *argv[])
 {
-	int ret=0;
+	uint64_t cycles=0;
 
 	if (argc < 2) {
 		usage();
@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
 	}
 
 	assemble();
-	ret = runtime();
-	printf("Finished runtime, executed %d cycles\n", ret);
-	return ret;
+	cycles = runtime();
+	printf("Finished runtime, executed %llu cycles\n", cycles);
+	return 0;
 }
