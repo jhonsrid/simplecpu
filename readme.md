@@ -7,16 +7,17 @@ C99 only, no dependencies other than libc and POSIX.
 
 ## Building
 * POSIX (Linux [x64 and Raspberry Pi]), OSX, Cygwin)
-** ./make.sh
+* ./make.sh
 
 * Windows (native, Visual Studio 2015 Community).
-** VS\simplecpu.sln
+* VS\simplecpu.sln
 
 ## Running
 * simplecpu asmfilename
-(Assembles and runs specified file). Currently no support for pre-assembled
-memory images.
+
+(Assembles and runs specified file). Currently no support for pre-assembled memory images.
 * simplecpu asmfilename 1
+
 (Same, but print more information about assembly process)
 
 ## Assembly language syntax
