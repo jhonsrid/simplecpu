@@ -15,8 +15,6 @@ void usage(void)
 
 int main(int argc, char *argv[])
 {
-	char* debugVal=0;
-
 	if (argc < 2) {
 		usage();
 		return -1;
