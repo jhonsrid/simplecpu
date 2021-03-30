@@ -5,12 +5,12 @@
 #include <limits.h>
 #include <stdarg.h>
 
-void debugout(const char *format, ...)
+void output(int always, const char *format, ...)
 {
 	va_list args;
 	va_start(args, format);
 
-	if(debugprint)
+	if(debugprint || always)
 		vprintf(format, args);
 	va_end(args);
 }
@@ -58,13 +58,13 @@ static void assemble_ins(int tokloc)
 		if (!strcmp(tokenArray[tokloc].tokValue, instructions[i].name)) {
 
 			PCTARGET = getmop(i, tokloc); //instructions[i].opcode;
-			debugout("Assembled instruction       : %s to %d\n", instructions[i].name, PCVALUE);
+			output(0, "Assembled instruction       : %s to %d\n", instructions[i].name, PCVALUE);
 			gotins=1;
 			break;
 		}
 	}
 	if (!gotins) {
-		debugout("Found unknown instruction '%s', exiting...\n", tokenArray[tokloc].tokValue);
+		output(1, "Found unknown instruction '%s', exiting...\n", tokenArray[tokloc].tokValue);
 		exit(-1);
 	}
 	PCVALUE++;
@@ -84,7 +84,7 @@ static void assemble_char(int ins)
 	else
 		cand = *ch;
 
-	debugout("Assembled char literal      : '%c' to %d\n", cand, PCVALUE);
+	output(0, "Assembled char literal      : '%c' to %d\n", cand, PCVALUE);
 	PCTARGET = cand;
 	wordcount++;
 	PCVALUE++;
@@ -92,7 +92,7 @@ static void assemble_char(int ins)
 
 static void assemble_int(int ins)
 {
-	debugout("Assembled int literal       : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
+	output(0, "Assembled int literal       : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
 	PCTARGET = atoi(tokenArray[ins].tokValue);
 	wordcount++;
 	PCVALUE++;
@@ -104,7 +104,7 @@ static void assemble_string(int ins)
 	int i;
 	char *ch = tokenArray[ins].tokValue;
 	char *ch2 = tokenArray[ins].tokValue;
-	int len = strlen(ch);
+	int len = (int)strlen(ch);
 	int startpos = PCVALUE;
 
 	for (i=0; i < len; i++)
@@ -117,15 +117,15 @@ static void assemble_string(int ins)
 	PCTARGET = '\0';
 	wordcount++;
 	PCVALUE++;
-	debugout("Assembled string            : \"%s\" from %d to %d\n", ch2, startpos, PCVALUE);
+	output(0, "Assembled string            : \"%s\" from %d to %d\n", ch2, startpos, PCVALUE);
 }
 
-/* Add label to label list! */
+/* Add label to label list */
 static void assemble_label(int ins)
 {
 	labels[labelmax].name = tokenArray[ins].tokValue;
 	labels[labelmax].position = PCVALUE;
-	debugout("Added LABEL                 : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
+	output(0, "Added LABEL                 : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
 	labelmax++; 	/* DON'T Increment pc! */
 }
 
@@ -138,11 +138,11 @@ static void assemble_label_ref(char *ch)
 		{
 			PCTARGET = labels[i].position; /* Insert reference to correct memory location */
 			PCVALUE++;
-			debugout("Inserted LABEL REF          : '%s' to %d\n", ch, PCVALUE);
+			output(0, "Inserted LABEL REF          : '%s' to %d\n", ch, PCVALUE);
 			return;
 		}
 	}
-	debugout("ERROR: Could not find LABEL for REF '%s'\n", ch);
+	output(1, "ERROR: Could not find LABEL for REF '%s'\n", ch);
 	exit(-1);
 }
 
@@ -170,11 +170,11 @@ static void assemble_variable_ref(char *ch)
 			/* Insert reference to correct memory location */
 			PCTARGET = variables[i].position;
 			PCVALUE++;
-			debugout("Inserted VARIABLE REF       : '%s' to %d\n", ch, PCVALUE);
+			output(0, "Inserted VARIABLE REF       : '%s' to %d\n", ch, PCVALUE);
 			return;
 		}
 	}
-	debugout("ERROR: Could not find VARIABLE for REF '%s'\n", ch);
+	output(1, "ERROR: Could not find VARIABLE for REF '%s'\n", ch);
 	exit(-1);
 }
 
@@ -203,7 +203,7 @@ static void assemble_variable(int *ins)
 	variables[variablemax].position = PCVALUE;
 	variables[variablemax].size = varlen;
 
-	debugout("Added VARIABLE '%s' of size %d to %d\n", tokenArray[*ins].tokValue, variables[variablemax].size, PCVALUE);
+	output(0, "Added VARIABLE '%s' of size %d to %d\n", tokenArray[*ins].tokValue, variables[variablemax].size, PCVALUE);
 	PCVALUE+=varlen; /* DO increment pc, (based on variable size)! */
 	variablemax++;
 }
@@ -214,7 +214,7 @@ static int GetReg(char *tok)
 		tok++;
 		return atoi(tok);
 	}
-	debugout("Could not get register number (exiting)...\n");
+	output(1, "Could not get register number (exiting)...\n");
 	exit(-1);
 }
 
@@ -225,10 +225,10 @@ static void assemble_rebase(int *ins)
 
 	if (val < previous_rebase || val < PCVALUE)
 	{
-		debugout("Cannot rebase to PREVIOUS location (Previous rebase: %d, PC: %d, new location: %d)\n", previous_rebase, PCVALUE, val);
+		output(1, "Cannot rebase to PREVIOUS location (Previous rebase: %d, PC: %d, new location: %d)\n", previous_rebase, PCVALUE, val);
 		exit(-1);
 	}
-	debugout("REBASE moved from           : %d to %d\n", PCVALUE, val);
+	output(0, "REBASE moved from           : %d to %d\n", PCVALUE, val);
 	previous_rebase = val;
 	PCVALUE = val;
 	*ins = *ins + 1; /* Skip next instruction */
@@ -237,7 +237,7 @@ static void assemble_rebase(int *ins)
 static void assemble_register(int ins)
 {
 	PCTARGET = GetReg(tokenArray[ins].tokValue);
-	debugout("Assembled REGISTER          : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
+	output(0, "Assembled REGISTER          : '%s' to %d\n", tokenArray[ins].tokValue, PCVALUE);
 	wordcount++;
 	PCVALUE++;
 }
@@ -264,7 +264,7 @@ void createvariable(char *name, int location)
 {
 	variables[variablemax].name = _strdup(name);
 	variables[variablemax].position = location;
-	debugout("Created VARIABLE            : '%s' to %d\n", name, location);
+	output(0, "Created VARIABLE            : '%s' to %d\n", name, location);
 	variablemax++;
 }
 
@@ -290,7 +290,7 @@ void assemble(void)
 	int i, j;
 
 	PCVALUE = STARTPOS;
-	memory[STARTPOS] = HLT; /* Just in case nothing is assembled */
+	mem[STARTPOS] = HLT; /* Just in case nothing is assembled */
 	createvariables();
 
 	for(i=0; i < tokenpos; i++)
@@ -311,14 +311,14 @@ void assemble(void)
 		}
 	}
 
-	debugout("\nAssembled %d tokens, (used %d memory words)\n", tokenpos, PCVALUE - STARTPOS);
+	output(1, "\nAssembled %d tokens, (used %d memory words)\n", tokenpos, PCVALUE - STARTPOS);
 
-	debugout("Inserting label references...\n");
+	output(0, "Inserting label references...\n");
 	j = assemble_label_refs();
-	debugout("Inserted %d label references.\n\n", j);
+	output(0, "Inserted %d label references.\n\n", j);
 
-	debugout("Inserting variable references...\n");
+	output(0, "Inserting variable references...\n");
 	j = assemble_variable_refs();
-	debugout("Inserted %d variable references.\n", j);
-	debugout("Assembly complete\n");
+	output(0, "Inserted %d variable references.\n", j);
+	output(0, "Assembly complete\n");
 }

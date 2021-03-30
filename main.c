@@ -9,27 +9,24 @@
 
 void usage(void)
 {
-	printf("Usage:\n\n");
-	printf("main filenametoassembleandrun <optional>1\n");
-	printf("1 is 'debug' flag\n");
+	printf("Usage: simplecpu filenametoassembleandrun [Y]\n");
+	printf("Where Y is optionally \"Print debug\"\n");
 }
 
 int main(int argc, char *argv[])
 {
-	uint64_t cycles=0;
+	char* debugVal=0;
 
 	if (argc < 2) {
 		usage();
 		return -1;
 	}
 
-	tokenize(argv[1]);
-	if (argc == 3) {
-		debugprint = atoi(argv[2]);
-	}
+	if (argv[2] && (*argv[2] == 'Y' || *argv[2] == 'y'))
+		debugprint = 1;
 
+	tokenize(argv[1]);
 	assemble();
-	cycles = runtime();
-	printf("Finished runtime, executed %llu cycles\n", cycles);
+	runtime();
 	return 0;
 }

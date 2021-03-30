@@ -1,24 +1,24 @@
 #include <stdint.h>
 
-#define PCVALUE memory[0]
-#define PCTARGET memory[memory[0]]
-#define PCTARGETPLUS1 memory[memory[0] +1]
-#define PCTARGETPLUS2 memory[memory[0] +2]
-#define PCDEREF memory[memory[memory[0]]
-#define PCDEREFPLUS1 memory[memory[memory[0] +1]]
-#define PCDEREFPLUS2 memory[memory[memory[0] +2]]
+#define PCVALUE mem[0]
+#define PCTARGET mem[mem[0]]
+#define PCTARGETPLUS1 mem[mem[0] +1]
+#define PCTARGETPLUS2 mem[mem[0] +2]
+#define PCDEREF mem[mem[mem[0]]
+#define PCDEREFPLUS1 mem[mem[mem[0] +1]]
+#define PCDEREFPLUS2 mem[mem[mem[0] +2]]
 
-#define PCADDRESSDEREF memory[memory[memory[memory[0]]]]
-#define PCADDRESSDEREFPLUS1 memory[memory[memory[memory[0] +1]]]
-#define PCADDRESSDEREFPLUS2 memory[memory[memory[memory[0] +2]]]
+#define PCADDRESSDEREF mem[mem[mem[mem[0]]]]
+#define PCADDRESSDEREFPLUS1 mem[mem[mem[mem[0] +1]]]
+#define PCADDRESSDEREFPLUS2 mem[mem[mem[mem[0] +2]]]
 
-#define SPVALUE memory[1]
+#define SPVALUE mem[1]
 
 #define BASEMEM 4096
 #define MEMWORDS (BASEMEM + 16 + 2)	/* Word addressed machine, "16" is to leave room for interrupt vectors on top, plus gap plus INPORTC above that! */
 #define STACKTOP (BASEMEM - 1)		/* Start stack at (0 based) BASEMEM-1, (ie last word in memory) */
 #define STACKELEMENTS 1000			/* Maximum number of elements in stack */
-#define STARTPOS 16					/* Start at memory location 16, (0 based), to avoid scribbing on registers! */
+#define STARTPOS 16					/* Start at memory location 16, (0 based), to avoid scribbling on registers! */
 #define VECTOR_BASE	1024			/* 0 based, ie 1025th element */
 #define KBDPOLL_INTERVAL 1000		/* Number of cycles between keyboard polls */
 #define VECTOR_COUNT 16				/* How many interrupt vectors? */
@@ -35,11 +35,11 @@
 #define OUTPORTI_LOCATION (1 << 23) + 2
 #define INPORTC_LOCATION (MEMWORDS - 1) /* no INPORTI */
 
-#define pc 0
+#define PCREGISTER 0
 
 #ifdef MAIN_GLOBALS
 
-int memory[MEMWORDS]; /* 16777216 bytes (4194304 words). ((22bit addressing) */
+int mem[MEMWORDS]; /* 16777216 bytes (4194304 words). ((22bit addressing) */
 
 /* Flags aren't part of a register yet */
 uint8_t eq; /* Equality flag */
@@ -49,7 +49,7 @@ int stoprun=0;
 int absolute=0; /* ie don't post-fiddle with pc */
 int wordcount=0; /* Assembly word count */
 #else
-extern int memory[MEMWORDS]; /* 16777216 bytes (4194304 words). ((22bit addressing) */
+extern int mem[MEMWORDS]; /* 16777216 bytes (4194304 words). ((22bit addressing) */
 extern uint8_t eq; /* Equality flag */
 extern uint8_t c;  /* Carry flag */
 extern int stoprun;
@@ -200,7 +200,6 @@ void setlvrv(int lam, int ram, int opcode);
 
 /* platform.c */
 int posix_kbhit(void);
-char buffered_getchar(void);
 
 #define KEYPRESS_INTERRUPT 0 /* IRQ0 is the keypress interrupt */
 #define OS_INTERRUPT 1 /* Operating system interrupt for system calls */

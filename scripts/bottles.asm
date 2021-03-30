@@ -34,29 +34,29 @@ RET
 CMP $NUMBOTTLES 1
 JEQ :ONEBOTT
 MOV R10 :BOTTLES
-CALL :PRINTC
+CALL :PRINTSTR
 RET
 :ONEBOTT
 MOV R10 :BOTTLE
-CALL :PRINTC
+CALL :PRINTSTR
 RET
 
 :PRINTONWALL
 MOV R10 :ONWALL
-CALL :PRINTC
+CALL :PRINTSTR
 RET
 
 :PRINTTAKEONE
 MOV R10 :TAKEONE
-CALL :PRINTC
+CALL :PRINTSTR
 RET
 
-;;;;;;;;; Simple PRINTF routine ;;;;;;;;;
-:PRINTC
+;;;;;;;;; PRINTSTR ;;;;;;;;;
+:PRINTSTR
 MOV $OUTPORTC [R10]	         ; Write dereference of address
 INC	R10                      ; Increment address in A
 CMP [R10] 0			             ; Reached end?
-JNQ :PRINTC                  ; Jump back if not.
+JNQ :PRINTSTR                  ; Jump back if not.
 RET
 
 ;;;;;;;; DATA LABELS ;;;;;;;;;;;

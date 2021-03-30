@@ -11,7 +11,7 @@
 static int *lv, *rv;
 static int lvvirtual, rvvirtual;
 
-static void push2(int reg)
+static void push_inner(int reg)
 {
 	if (SPVALUE < (STACKTOP - STACKELEMENTS))
 	{
@@ -19,31 +19,25 @@ static void push2(int reg)
 		exit(-1);
 	}
 
-	memory[SPVALUE] = memory[reg];
+	mem[SPVALUE] = mem[reg];
 	SPVALUE--; /* Decrement */
 }
 
-unsigned char prevchar = 0; /* Bodge for windows, if prevchar was CR, send LF this time. */
 
 int dokbd(void)
 {
 #ifdef WIN32
-	if (prevchar == 13) {
-		memory[INPORTC_LOCATION] = 10;
-		prevchar = 10;
-		return 1;
-	}
 	if (_kbhit()) {
-		memory[INPORTC_LOCATION] = _getch();
-		prevchar = (unsigned char)memory[INPORTC_LOCATION];
+		mem[INPORTC_LOCATION] = _getch();
+		if (mem[INPORTC_LOCATION] == '\r')
+			mem[INPORTC_LOCATION] = '\n'; // _getch only ever returns '\r'
 		return 1;
 	}
 #else
 	if (posix_kbhit())
 	{
-		//int test = buffered_getchar();
 		int test = getchar();
-		memory[INPORTC_LOCATION] = test;
+		mem[INPORTC_LOCATION] = test;
 		return 1;
 	}
 #endif
@@ -54,15 +48,15 @@ return 0;
 void inner_irq(int lam, int ram, int irqnum)
 {
 	pushu(lam, ram);		/* Push all user registers, (not PC, SP or R15!) */
-	push2(pc);				/* Push PC */
+	push_inner(PCREGISTER);				/* Push PC */
 
 	if (irqnum < 0 || irqnum > 15) {
 		printf("RUNTIME ERROR: Illegal IRQ number %d\n", irqnum);
 		exit(-1);
 	}
-	PCVALUE = memory[VECTOR_BASE + irqnum]; /* Set PC to dereference of vector table */
+	PCVALUE = mem[VECTOR_BASE + irqnum]; /* Set PC to dereference of vector table */
 	if (PCVALUE < VECTOR_COUNT || PCVALUE > MEMWORDS) {
-		printf("RUNTIME ERROR: Illegal PC value (%d) from IRQ (%d) deref (%d) in vector table\n", PCVALUE, irqnum, memory[VECTOR_BASE + irqnum]);
+		printf("RUNTIME ERROR: Illegal PC value (%d) from IRQ (%d) deref (%d) in vector table\n", PCVALUE, irqnum, mem[VECTOR_BASE + irqnum]);
 	}
 }
 
@@ -150,13 +144,13 @@ void mov(int lam, int ram)
 	if (lvvirtual)
 	{
 		if (lvvirtual == OUTPORTC_LOCATION)
-			printf("%c", *rv);
+			putchar((char)*rv);
 		else if (lvvirtual == OUTPORTI_LOCATION)
 			printf("%d", *rv);
 	}
 	else if (rvvirtual && rvvirtual == INPORTC_LOCATION)
 	{
-		*lv = memory[INPORTC_LOCATION];
+		*lv = mem[INPORTC_LOCATION];
 	}
 	else
 		*lv = *rv;
@@ -199,7 +193,7 @@ static void pop_inner(int reg)
 	}
 
 	SPVALUE++; /* Increment */
-	memory[reg]  = memory[SPVALUE]; /* Dereference SP */
+	mem[reg]  = mem[SPVALUE]; /* Dereference SP */
 }
 
 void jeq(int lam, int ram)  { jmp_inner(lam, ram, eq); }
@@ -207,14 +201,14 @@ void jnq(int lam, int ram)  { jmp_inner(lam, ram, !eq); }
 void jgt(int lam, int ram)  { jmp_inner(lam, ram, (c && !eq)); }
 void jlt(int lam, int ram)  { jmp_inner(lam, ram, (!c && !eq)); }
 void jmp(int lam, int ram)  { jmp_inner(lam, ram, 1); }
-void push(int lam, int ram) { push2(PCTARGETPLUS1); }
+void push(int lam, int ram) { push_inner(PCTARGETPLUS1); }
 void pop(int lam, int ram)  { pop_inner(PCTARGETPLUS1); }
 
 void pushu(int lam, int ram) /* Push all user registers, (not PC, SP or R15 (return register)) */
 {
 	int reg;
 	for (reg=2; reg < 15; reg++) {
-		push2(reg);
+		push_inner(reg);
 	}
 }
 
@@ -229,14 +223,14 @@ void popu(int lam, int ram) /* Pop all user registers, (not PC, SP or R15 (retur
 void call(int lam, int ram)
 {
 	pushu(lam, ram);	/* Push all user registers, (not PC, SP or R15!) */
-	push2(pc);
+	push_inner(PCREGISTER);
 	PCVALUE = PCTARGETPLUS1;
 	absolute = 1;
 }
 
 void ret(int lam, int ram)
 {
-	pop_inner(pc);		/* Let runtime increment pc for us! */
+	pop_inner(PCREGISTER);		/* Let runtime increment pc for us! */
 	popu(lam, ram);	/* Pop all user registers (not PC, SP or R15!) */
 	PCVALUE = PCVALUE + 1;	/* increment PC, runtime will increment again. (Ie skip *2* bytes, ie "CALL <loc>") */
 }
@@ -249,6 +243,6 @@ void sub(int lam, int ram)  { *lv = (*lv) - (*rv); } /* No overflow check! */
 void nop(int lam, int ram)  {}
 void hlt(int lam, int ram)
 {
-	printf("\nGot HALT at location %d (%d)\n", pc, memory[pc]);
+	printf("\nGot HALT at location %d (%d)\n", PCREGISTER, mem[PCREGISTER]);
 	stoprun=1;
 }

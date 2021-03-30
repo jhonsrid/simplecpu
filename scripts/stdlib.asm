@@ -4,13 +4,13 @@
 ; Subroutine, so can only be included after program code.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 :STRLEN
-MOV R16 0
+MOV R16 0           ; 
 :STRLENLOOP
-CMP [R10] 0	
-JEQ :STRLENEND
-INC R16
-INC R10
-JMP :STRLENLOOP
+CMP [R10] 0	        ; Does R10 pointer point to 0?
+JEQ :STRLENEND      ; Have we hit end of string?
+INC R16             ; Increment length
+INC R10             ; Increment pointer
+JMP :STRLENLOOP     ; Continue
 :STRLENEND
 RET
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -1,6 +1,6 @@
-# simplecpu, a simple CPU emulator and assembler in C99, ~1000 LOC.
+# simplecpu, a simple CPU architecture, emulator and assembler in C99, ~1000 LOC.
 
-C99 only, no dependencies other than libc and POSIX.
+C99, no dependencies other than libc and POSIX. Doesn't use lexx/flex or yacc/bison for lexing / parsing.
 
 ## Directories
 * scripts contains example .ASM files to run.
@@ -12,13 +12,11 @@ C99 only, no dependencies other than libc and POSIX.
 * Windows (native, Visual Studio 2015 Community).
 * VS\simplecpu.sln
 
-## Running
-* simplecpu asmfilename
+## Running
+* simplecpu asmfilename [Y]
 
-(Assembles and runs specified file). Currently no support for pre-assembled memory images.
-* simplecpu asmfilename 1
-
-(Same, but print more information about assembly process)
+Assembles and runs specified file. Currently no support for pre-assembled memory images.
+Y being optional debug output from assembler.
 
 ## Assembly language syntax
 ;										Comment
@@ -37,57 +35,52 @@ C99 only, no dependencies other than libc and POSIX.
 Target operand is first, eg:
     ADD REG LIT will add literal LIT to register REG.
 
-### Instructions:
+### Instructions:
 
 * HLT							HALT (stop CPU)
 * NOP							No operation
 * INC REG						Increment register, eg INC R10
 * DEC REG						Decrement register, eg DEC R10
-* ADD REG LIT					Add literal to register
-* ADD REG REG     				Add register v
-* ADD REG LIT
-* ADD REG REG
-* SUB REG LIT
-* SUB REG REG
-* MUL REG LIT
-* MUL REG REG
-* JMP :LABEL
+* ADD REG (LIT|REG)				Add literal or register value to register
+* SUB REG (LIT|REG)             Subtract literal or register value from register
+* MUL REG (LIT|REG)             Multiply register value by literal or register value
+* JMP :LABEL                    Unconditional jump to :LABEL
 * JEQ :LABEL					Jump to :LABEL if equal
 * JNQ :LABEL					Jump to :LABEL if not equal
 * JGT :LABEL					Jump to :LABEL if greater than
 * JLT :LABEL					Jump to :LABEL if less than
-* MOV REG REG			
-* MOV REG LIT
-* MOV REG PORT					MOV R9 $INPORTC or MOV R9 $INPORTI
-* MOV PORT REG					MOV $OUTPORTC R10 or MOV $OUTPORTI R10		
-* CMP REG LIT					Compare and set flags
-* CMP REG REG					Compare and set flags
-* PUSH LIT
-* PUSH REG
-* POP REG						Pop to specific register
+* MOV REG (LIT|REG|PORT)        Copy value from register, literal or port to register, eg: MOV R9 $INPORTC
+* MOV PORT REG					Copy value from register to port, eg: MOV $OUTPORTC R10 or MOV $OUTPORTI R10		
+* CMP REG (LIT|REG)				Compare and set flags 
+* PUSH (LIT|REG)				Push value or register value to stack
+* POP REG						Pop value to specific register
 * CALL							Call :LABELNAME (Subroutine call)
 * RET							Return from subroutine
 * PUSHU							Push all user registers to stack, (not SP or PC).
 * POPU							Pop all user registers from stack, (not SP or PC).
 * IRQ NUM						Raise IRQ
-* REBASE						Choose different memory location to continue assembling from.
 * MOD REG LIT					Modulo division, leave remainder in REG.
 * MOD REG REG					Modulo division, leave remainder in REG.
 
-### Flags:
+### Additional Assembler instructions:
+Not CPU instructions, but commands for assembler.
+* REBASE						Choose different memory location to continue assembling from.
+
+### CPU Flags:
 * EQ							Equality flag
 * C								Carry flag
 
-### PORTS:
-$INPORTC						Input character
+### Supported PORTS:
 
-$INPORTI						Input integer
+* $INPORTC						Input character
 
-$OUTPORTC						Print output character
+* $INPORTI						Input integer
 
-$OUTPORTI						Print output integer
+* $OUTPORTC						Print output character
 
-$I00 - $I15						Interrupt vectors
+* $OUTPORTI						Print output integer
+
+* $I00 - $I15						Interrupt vectors
 
 ### VARIABLES
 $XYZABC							Assign label "XYZABC" to a word of storage.
@@ -116,7 +109,7 @@ R0 = PC
 
 R1 = SP
 
-R2 = Flags (Not yet used)
+R2 = Flags (Not yet supported)
 
 R3 to R9 = GP registers.
 
@@ -129,10 +122,19 @@ R12 = Third CALL register
 R16 = RETURN value register
 
 ### Stack
-Stack starts at nearly top of memory (STACKTOP) and grows downwards. - No
-checks (can overrun program code!)
+Stack starts at nearly top of memory (STACKTOP) and grows downwards. - No stack overflow checks.
 
 ### Variables
-(Check this)
-VARIABLE DECLARATION
-$VAR {10} ok.
+Declare word variables as:
+$NUMBOTTLES
+
+Declare static string variables as (for instance):
+
+:TAKEONE " take one down, pass it around, now there's "
+
+
+## TODO
+* Terminal control is incomplete for all platforms, so monitor.asm will not work (and is incomplete itself)
+* Interrupt driven I/O needs work
+* Would like to simplify instruction set further, possibly make this more 6502-like.
+* Not tested on Linux / MacOS / BSD

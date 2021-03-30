@@ -1,11 +1,9 @@
-/* Lexer, fixed grammar */
+/* Assembly language lexer, and parser with fixed grammar */
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 #include "main.h"
-
 
 int gotinstruction = 0;
 
@@ -22,8 +20,6 @@ void removeChar(char *str, char toremove)
 /* Determine token type from token text */
 int getTokenType(char *token)
 {
-	int i;
-
 	if (strncmp(token, "REBASE", 6) == 0)
 	{
 		token = token + 6;
@@ -37,7 +33,8 @@ int getTokenType(char *token)
 		return TOKTYPE_DEREF;
 	}
 
-	if (*token == ':') return (gotinstruction) ? TOKTYPE_LABEL_REF : TOKTYPE_LABEL;
+	if (*token == ':') 
+		return (gotinstruction) ? TOKTYPE_LABEL_REF : TOKTYPE_LABEL;
 
 	if (*token == ';')
 		return TOKTYPE_COMMENT;
@@ -64,7 +61,7 @@ int getTokenType(char *token)
 
 	if (*token == '$') return (gotinstruction) ? TOKTYPE_VARIABLE_REF : TOKTYPE_VARIABLE;
 
-	for (i = 0; i < INSTRUCTION_COUNT; i++)
+	for (int i = 0; i < INSTRUCTION_COUNT; i++)
 	{
 		if (strncmp(instructions[i].name, token, 3) == 0) {
 			gotinstruction=1;

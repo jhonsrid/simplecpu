@@ -1,2 +1,1 @@
-gcc -o simplecpu `ls *.c` -g -Wall -Wextra -Wno-unused-parameter
-
+gcc -o simplecpu *.c -g -Wall -Wextra -Wno-unused-parameter
